@@ -38,7 +38,9 @@ class SessionsController {
             expiresIn
         }) // gera um token JWT para o usuário autenticado
 
-        return response.json({ token }) // retorna o token na resposta
+        const { password: hashedPassword, ...userWithoutPassword} = user // remove a senha do objeto do usuário para não enviá-la na resposta
+
+        return response.json({ token, user: userWithoutPassword }) // retorna o token na resposta e os dados do usuário sem a senha
     }
 }
 
