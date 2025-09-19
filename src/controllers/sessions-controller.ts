@@ -5,6 +5,8 @@ import { prisma } from "@/database/prisma"
 import { z } from "zod";
 import { AppError } from "@/utils/AppError";
 import { compare } from "bcrypt"
+import { authConfig } from "@/configs/auth"
+import { sign } from "jsonwebtoken"
 
 class SessionsController {
     async create(request: Request, response: Response) {
@@ -29,7 +31,14 @@ class SessionsController {
             throw new AppError("E-mail ou senha incorretos", 401)
         } // se as senhas não corresponderem, lança um erro de autenticação
 
-        return response.json({ message: "ok!"})
+        const { secret, expiresIn } = authConfig.jwt // extrai o segredo e o tempo de expiração da configuração de autenticação
+
+        const token = sign({ role: user.role ?? "customer" }, secret, {
+            subject: user.id,
+            expiresIn
+        }) // gera um token JWT para o usuário autenticado
+
+        return response.json({ token }) // retorna o token na resposta
     }
 }
 
