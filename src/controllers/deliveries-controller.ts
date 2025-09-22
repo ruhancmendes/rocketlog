@@ -22,6 +22,13 @@ class DeliveriesController {
 
         return response.status(201).json();
     }
+
+    async index(request: Request, response: Response) {
+        //listar todas as entregas
+        const deliveries = await prisma.delivery.findMany(); //buscar todas as entregas no banco de dados
+
+        return response.json(deliveries);
+    }
 }
 
 export { DeliveriesController };
