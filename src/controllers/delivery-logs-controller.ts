@@ -35,6 +35,24 @@ class DeliveryLogsController {
 
         return response.status(201).json()
     }
+
+    async show(request: Request, response: Response) {
+        const paramsSchema = z.object({
+            delivery_id: z.string().uuid(),
+        }) // validando os parâmetros da requisição
+
+        const { delivery_id } = paramsSchema.parse(request.params) // extraindo o id da entrega dos parâmetros
+
+        const delivery = await prisma.delivery.findUnique({
+            where: { id: delivery_id }
+        }) // verificar se a entrega existe
+
+        if(request.user?.role === "customer" && request.user.id !== delivery?.userId){
+            throw new AppError("The customer can only see their own deliveries", 401)
+        }// se o usuário for cliente, verificar se ele é dono da entrega
+
+        return response.json(delivery)
+    }
 }
 
 export { DeliveryLogsController }
