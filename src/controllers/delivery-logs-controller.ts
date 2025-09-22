@@ -44,7 +44,11 @@ class DeliveryLogsController {
         const { delivery_id } = paramsSchema.parse(request.params) // extraindo o id da entrega dos parâmetros
 
         const delivery = await prisma.delivery.findUnique({
-            where: { id: delivery_id }
+            where: { id: delivery_id },
+            include: { 
+                user: true,
+                logs: { select: { description: true }},
+            },// incluindo os logs relacionados
         }) // verificar se a entrega existe
 
         if(request.user?.role === "customer" && request.user.id !== delivery?.userId){
