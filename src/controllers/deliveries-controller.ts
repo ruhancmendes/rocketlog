@@ -25,7 +25,11 @@ class DeliveriesController {
 
     async index(request: Request, response: Response) {
         //listar todas as entregas
-        const deliveries = await prisma.delivery.findMany(); //buscar todas as entregas no banco de dados
+        const deliveries = await prisma.delivery.findMany({
+            include: {
+                user: { select: { name: true, email: true } } //incluir o nome e email do usuário relacionado
+            },
+        }); //buscar todas as entregas no banco de dados
 
         return response.json(deliveries);
     }
