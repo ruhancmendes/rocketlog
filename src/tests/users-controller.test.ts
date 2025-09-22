@@ -2,8 +2,15 @@
 
 import request from "supertest"
 import { app } from "@/app"
+import { prisma } from "@/database/prisma"
 
 describe("UsersController", () => {
+    let user_id: string // Variável para armazenar o ID do usuário criado
+
+    afterAll(async () => {
+        await prisma.user.delete({ where: { id: user_id } }) // Limpa o usuário criado após os testes
+    })
+
     it("should create a new user successfully", async () => {
         const response = await request(app).post("/users").send({
             name: "Test User",
@@ -14,5 +21,7 @@ describe("UsersController", () => {
         expect(response.status).toBe(201)
         expect(response.body).toHaveProperty("id")
         expect(response.body.name).toBe("Test User")
+
+        user_id = response.body.id // Armazena o ID do usuário criado
     })
 })
